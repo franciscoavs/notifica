@@ -32,7 +32,7 @@
   .brandtext h1{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:800;font-size:20px;letter-spacing:-.02em;margin:0;line-height:1.05;}
   .brandtext p{margin:2px 0 0;font-size:12.5px;color:#a9d6bb;font-weight:500;letter-spacing:.01em}
   @media(max-width:430px){.if-logo{width:54px;min-width:54px}.if-logo-text{display:none}.brandrow{gap:10px}.brandtext h1{font-size:19px}}
-  .gear{margin-left:auto;background:rgba(255,255,255,.12);border:none;color:#fff;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;cursor:pointer;transition:background .15s;}
+  .gear{margin-left:auto;background:rgba(255,255,255,.12);border:none;color:#fff;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;cursor:pointer;transition:background .15s;flex:none}
   .gear:active{background:rgba(255,255,255,.25)}
   .gear svg{width:20px;height:20px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;margin-bottom:16px;box-shadow:var(--shadow);}
@@ -65,10 +65,6 @@
   .send:active{transform:translateY(1px);filter:brightness(.97)}
   .send svg{width:20px;height:20px}
   .send:disabled{background:#cfcbbf;box-shadow:none;cursor:not-allowed}
-  .alt{display:flex;gap:10px;margin-top:11px}
-  .alt button{flex:1;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--green-700);background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;}
-  .alt button:active{background:var(--green-100)}
-  .alt svg{width:16px;height:16px}
   .hint{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.45}
   .warnbar{display:none;background:#fff3e6;border:1px solid #f3cfa6;color:#9a5212;border-radius:11px;padding:10px 12px;font-size:13px;margin-bottom:14px;font-weight:500;}
   .warnbar.show{display:block}
@@ -79,8 +75,6 @@
   .grab{width:40px;height:4px;border-radius:99px;background:#cbcdbf;margin:8px auto 16px}
   .drawer h2{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:19px;margin:0 0 4px;letter-spacing:-.02em}
   .drawer .sub{font-size:13px;color:var(--muted);margin:0 0 18px}
-  .subhead{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--green-700);margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
-  .subhead.first{border-top:none;padding-top:0;margin-top:4px}
   .closebtn{width:100%;font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--green-700);border:none;border-radius:13px;padding:14px;margin-top:8px;cursor:pointer;}
   .closebtn:active{background:var(--green-900)}
   .hist-item{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;background:#fbfaf6}
@@ -88,8 +82,11 @@
   .hist-item .nm{font-weight:700;font-size:14px}
   .hist-item .tm{font-size:11.5px;color:var(--muted);flex:none}
   .hist-item .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .hist-item .copybtn{margin-top:10px;font:inherit;font-weight:700;font-size:12.5px;cursor:pointer;color:var(--green-700);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;display:inline-flex;align-items:center;gap:7px;transition:background .15s}
+  .hist-item .copybtn:active{background:var(--green-100)}
+  .hist-item .copybtn svg{width:14px;height:14px}
   .empty{font-size:13px;color:var(--muted);text-align:center;padding:14px 0}
-  .clearlink{background:none;border:none;color:var(--danger);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;padding:0;margin-top:4px}
+  .clearlink{display:block;background:none;border:none;color:var(--danger);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;padding:6px 0;margin:6px 0 2px}
   .toast{position:fixed;left:50%;bottom:26px;translate:-50% 0;background:var(--green-900);color:#fff;padding:12px 20px;border-radius:99px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .25s, translate .25s;z-index:60;max-width:90%;text-align:center}
   .toast.show{opacity:1;translate:-50% -10px}
   .foot{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}
@@ -113,14 +110,17 @@
       </svg>
       <div class="if-logo-text">
         <strong>Instituto Federal</strong>
-        <span>Sertão Paraibano  Campus Cajazeiras</span>
+        <span>Sertão Paraibano · Campus Cajazeiras</span>
       </div>
     </div>
     <div class="brandtext">
       <h1>notIFica-CZ</h1>
       <p>Encaminhamento · Cursos Integrados</p>
     </div>
-</div>
+    <button class="gear" id="histBtn" aria-label="Ver histórico" title="Histórico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg>
+    </button>
+  </div>
 </header>
 
 <div class="wrap">
@@ -214,14 +214,19 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
     <span id="sendLabel">Enviar notificação</span>
   </button>
-  <div class="alt">
-    <button id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copiar texto</button>
-    <button id="wpp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>WhatsApp</button>
-  </div>
-  <p class="hint" id="installhint">Dica: Pelo celular, o usuário também pode favoritar/adicionar o link à tela inicial.</p>
   <p class="foot">Ao enviar, o app abre o e-mail já pronto para a coordenação certa. Nada é enviado sem você confirmar.</p>
 </div>
 
+<!-- ===== Gaveta de histórico (fica salvo só neste navegador) ===== -->
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Histórico de encaminhamentos">
+  <div class="grab"></div>
+  <h2>Histórico de encaminhamentos</h2>
+  <p class="sub">Os registros ficam salvos apenas neste navegador/aparelho.</p>
+  <div id="histList"></div>
+  <button class="clearlink" id="clearHist">Limpar histórico deste navegador</button>
+  <button class="closebtn" id="closeDrawer">Fechar</button>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -414,21 +419,6 @@
     });
   }
 
-  function salvarHist(d,alvos,modo){
-    hist.unshift({
-      nome:d.estudante,
-      tipo:d.tipo,
-      curso:d.curso,
-      turma:d.turma,
-      urg:d.urgencia,
-      alvos:alvos,
-      modo:modo||"",
-      quando:dataBR()
-    });
-    hist=hist.slice(0,20);
-    store.set("notifica.hist",hist);
-  }
-
   function alvosCurtos(dest){
     var a=[];
     if(dest.curso)a.push("Curso");
@@ -437,50 +427,98 @@
     return a.join("+");
   }
 
- function mailtoFallback(d,dest){
-    var tos=emailsFallback(d,dest);
-    if(!tos.length) return false;
-
-    var url =
-      "https://mail.google.com/mail/?view=cm&fs=1" +
-      "&to="   + encodeURIComponent(tos.join(",")) +
-      "&su="   + encodeURIComponent(assunto(d)) +
-      "&body=" + encodeURIComponent(corpo(d));
-
-    window.open(url, "_blank");
-    return true;
+  /* ===== Histórico (salvo só neste navegador via localStorage) ===== */
+  function salvarHist(d, dest, modo){
+    var tos = emailsFallback(d, dest);
+    hist.unshift({
+      estudante: d.estudante,
+      prof:      d.prof,
+      tipo:      d.tipo,
+      curso:     d.curso,
+      turma:     d.turma,
+      urg:       d.urgencia,
+      alvos:     alvosCurtos(dest),
+      para:      tos.join(", "),
+      modo:      modo || "",
+      quando:    dataBR(),
+      assunto:   assunto(d),
+      // texto completo e copiável do que foi montado:
+      texto:     "Para: " + tos.join(", ") + NL + "Assunto: " + assunto(d) + NL + NL + corpo(d)
+    });
+    hist = hist.slice(0, 50);
+    store.set("notifica.hist", hist);
   }
 
-  function enviar(){
-    if(enviando) return;
+  function renderHist(){
+    var box = $("histList");
+    box.innerHTML = "";
 
-    var f=faltando();
-    if(f.length){
-      mostrarWarn("Falta preencher: "+f.join(", ")+".");
+    if(!hist.length){
+      var e = document.createElement("p");
+      e.className = "empty";
+      e.textContent = "Nenhum encaminhamento registrado neste navegador ainda.";
+      box.appendChild(e);
+      $("clearHist").style.display = "none";
       return;
     }
 
-    mostrarWarn("");
+    $("clearHist").style.display = "block";
 
-    var d=dadosForm(), dest=destState();
-    if(mailtoFallback(d,dest)){
-      salvarHist(d,alvosCurtos(dest),"e-mail");
-      toast("E-mail aberto — é só confirmar o envio ✓");
-    } else {
-      toast("Não consegui montar o e-mail. Tente de novo.");
-    }
+    hist.forEach(function(h){
+      var item = document.createElement("div");
+      item.className = "hist-item";
+
+      var top = document.createElement("div");
+      top.className = "top";
+      var nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = h.estudante || h.nome || "—";
+      var tm = document.createElement("span");
+      tm.className = "tm";
+      tm.textContent = h.quando || "";
+      top.appendChild(nm);
+      top.appendChild(tm);
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      var partes = [];
+      if(h.tipo)  partes.push(h.tipo);
+      if(h.curso) partes.push(h.curso + (h.turma ? " · " + h.turma : ""));
+      if(h.urg)   partes.push("Urgência: " + h.urg);
+      if(h.alvos) partes.push("→ " + h.alvos);
+      meta.textContent = partes.join("  ·  ");
+
+      item.appendChild(top);
+      item.appendChild(meta);
+
+      if(h.texto){
+        var btn = document.createElement("button");
+        btn.className = "copybtn";
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copiar mensagem';
+        btn.addEventListener("click", function(){ copiarTexto(h.texto); });
+        item.appendChild(btn);
+      }
+
+      box.appendChild(item);
+    });
   }
 
-  function copiar(){
-    var d=dadosForm();
-    var txt=assunto(d)+NL+NL+corpo(d);
-    var done=function(){ toast("Texto copiado ✓"); };
+  function abrirHist(){
+    renderHist();
+    $("scrim").classList.add("open");
+    $("drawer").classList.add("open");
+  }
 
+  function fecharHist(){
+    $("scrim").classList.remove("open");
+    $("drawer").classList.remove("open");
+  }
+
+  /* ===== Cópia de texto (usada pelo histórico) ===== */
+  function copiarTexto(txt){
+    var done = function(){ toast("Mensagem copiada ✓"); };
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(done,function(){
-        fallbackCopy(txt);
-        done();
-      });
+      navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt); done(); });
     } else {
       fallbackCopy(txt);
       done();
@@ -499,7 +537,44 @@
     document.body.removeChild(ta);
   }
 
-  function enviarWpp(){
+  /* ===== Limpa o formulário depois do envio (mantém o responsável) ===== */
+  function limparFormulario(){
+    $("estudante").value = "";
+    $("curso").value = "";
+    atualizarTurmas();          // volta a turma para o estado inicial (desabilitada)
+    $("tipo").value = "";
+    $("descricao").value = "";
+
+    // urgência volta para "Baixa"
+    document.querySelectorAll("#urg button").forEach(function(x){ x.dataset.on = "false"; });
+    document.querySelector("#urg button.b").dataset.on = "true";
+    urgencia = "Baixa";
+
+    // destinatários voltam ao padrão (Curso + Pedagógica marcados; CLAI não)
+    document.querySelectorAll("#dest .chip").forEach(function(c){
+      var on = (c.dataset.key === "curso" || c.dataset.key === "ped");
+      c.classList.toggle("on", on);
+      c.querySelector("input").checked = on;
+    });
+
+    renderPreview();
+  }
+
+  function mailtoFallback(d,dest){
+    var tos=emailsFallback(d,dest);
+    if(!tos.length) return false;
+
+    window.location.href =
+      "mailto:" + tos.join(",") +
+      "?subject=" + encodeURIComponent(assunto(d)) +
+      "&body=" + encodeURIComponent(corpo(d));
+
+    return true;
+  }
+
+  function enviar(){
+    if(enviando) return;
+
     var f=faltando();
     if(f.length){
       mostrarWarn("Falta preencher: "+f.join(", ")+".");
@@ -508,16 +583,25 @@
 
     mostrarWarn("");
 
-    var d=dadosForm();
-    var txt=assunto(d)+NL+NL+corpo(d);
-
-    salvarHist(d,alvosCurtos(destState()),"WhatsApp");
-    window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");
+    var d=dadosForm(), dest=destState();
+    if(mailtoFallback(d,dest)){
+      salvarHist(d, dest, "e-mail");
+      toast("E-mail aberto — é só confirmar o envio ✓");
+      limparFormulario();
+    } else {
+      toast("Não consegui montar o e-mail. Tente de novo.");
+    }
   }
 
+  /* ===== Listeners ===== */
   ["professor","estudante","turma","tipo","descricao"].forEach(function(id){
     $(id).addEventListener("input",renderPreview);
     $(id).addEventListener("change",renderPreview);
+  });
+
+  // lembra o nome do responsável neste navegador
+  $("professor").addEventListener("input",function(){
+    store.set("notifica.prof", $("professor").value.trim());
   });
 
   $("curso").addEventListener("change",function(){
@@ -544,9 +628,18 @@
   });
 
   $("send").addEventListener("click",enviar);
-  $("copy").addEventListener("click",copiar);
-  $("wpp").addEventListener("click",enviarWpp);
+  $("histBtn").addEventListener("click",abrirHist);
+  $("scrim").addEventListener("click",fecharHist);
+  $("closeDrawer").addEventListener("click",fecharHist);
+  $("clearHist").addEventListener("click",function(){
+    hist = [];
+    store.set("notifica.hist", hist);
+    renderHist();
+    toast("Histórico limpo");
+  });
 
+  /* ===== Início ===== */
+  $("professor").value = store.get("notifica.prof", ""); // restaura o nome salvo
   atualizarTurmas();
   renderPreview();
 })();
