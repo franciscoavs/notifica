@@ -2,8 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="robots" content="noindex, nofollow, noarchive" />
-<meta name="googlebot" content="noindex, nofollow, noarchive" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0d3b22" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -122,7 +120,7 @@
       <h1>notIFica-CZ</h1>
       <p>Encaminhamento · Cursos Integrados</p>
     </div>
-  </div>
+</div>
 </header>
 
 <div class="wrap">
@@ -130,6 +128,10 @@
 
   <div class="card">
     <p class="section-title"><span class="dot"></span>Sobre o estudante</p>
+    <div class="field">
+      <label for="professor">Responsável pelo encaminhamento <span class="req">*</span></label>
+      <input type="text" id="professor" placeholder="Ex.: Profa. Tayla Serantoni" autocomplete="off">
+    </div>
     <div class="field">
       <label for="estudante">Nome do estudante <span class="req">*</span></label>
       <input type="text" id="estudante" placeholder="Ex.: Maria Souza" autocomplete="off">
@@ -220,279 +222,227 @@
   <p class="foot">Ao enviar, o app abre o e-mail já pronto para a coordenação certa. Nada é enviado sem você confirmar.</p>
 </div>
 
+
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
   "use strict";
 
-  /* ============ CONFIGURAÇÃO FIXA ============ */
+  /* ============ E-MAILS FIXOS ============ */
   /*
-    E-mails embarcados no código.
-    Para alterar algum endereço futuramente, edite apenas este bloco.
+    Ajuste apenas aqui se algum endereço institucional mudar.
+    O usuário do app não verá tela de configuração.
   */
   var CONFIG = {
     EMAILS: {
-      pedagogica: "coped.cz@ifpb.edu.br",
-      acessibilidade: "clai.cz@ifpb.edu.br"
-    },
-    CURSOS: {
-      "Edificações": {
-        email: "cted.cajazeiras@ifpb.edu.br",
-        turmas: ["INTED1", "INTED2", "INTED3"]
-      },
-      "Eletromecânica": {
-        email: "ctel.cz@ifpb.edu.br",
-        turmas: ["INTEL1", "INTEL2", "INTEL3"]
-      },
-      "Informática": {
-        email: "ctin.cz@ifpb.edu.br",
-        turmas: ["INTIN1", "INTIN2", "INTIN3"]
-      },
-      "Mecânica": {
-        email: "ctem.cz@ifpb.edu.br",
-        turmas: ["INTEM1", "INTEM2", "INTEM3"]
-      }
+      edif:      "cted.cajazeiras@ifpb.edu.br", /* Edificações */
+      eletro:    "ctel.cz@ifpb.edu.br",         /* Eletromecânica */
+      info:      "ctin.cz@ifpb.edu.br",         /* Informática */
+      mecanica:  "ctem.cz@ifpb.edu.br",         /* Mecânica — confirmar se este é o e-mail oficial */
+      ped:       "coped.cz@ifpb.edu.br",        /* Coordenação Pedagógica */
+      acess:     "clai.cz@ifpb.edu.br"          /* CLAI */
     }
   };
-  /* ========================================== */
 
+  var CURSOS = {
+    "Edificações": {
+      email: CONFIG.EMAILS.edif,
+      turmas: ["INTED1", "INTED2", "INTED3"]
+    },
+    "Eletromecânica": {
+      email: CONFIG.EMAILS.eletro,
+      turmas: ["INTEL1", "INTEL2", "INTEL3"]
+    },
+    "Informática": {
+      email: CONFIG.EMAILS.info,
+      turmas: ["INTIN1", "INTIN2", "INTIN3"]
+    },
+    "Mecânica": {
+      email: CONFIG.EMAILS.mecanica,
+      turmas: ["INTEM1", "INTEM2", "INTEM3"]
+    }
+  };
+  /* ======================================= */
+
+  var NL = String.fromCharCode(10);
   var mem = {};
   var store = {
-    get:function(k,fb){
-      try{
-        var v = localStorage.getItem(k);
-        return v === null ? fb : JSON.parse(v);
-      }catch(e){
-        return (k in mem) ? mem[k] : fb;
-      }
-    },
-    set:function(k,v){
-      try{
-        localStorage.setItem(k, JSON.stringify(v));
-      }catch(e){
-        mem[k] = v;
-      }
-    }
+    get:function(k,fb){ try{ var v=localStorage.getItem(k); return v===null?fb:JSON.parse(v);}catch(e){ return (k in mem)?mem[k]:fb; } },
+    set:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ mem[k]=v; } }
   };
-
   var $ = function(id){ return document.getElementById(id); };
+
   var hist = store.get("notifica.hist", []);
   var urgencia = "Baixa";
   var enviando = false;
 
-  function atualizarTurmas(){
-    var curso = $("curso").value;
-    var select = $("turma");
-    select.innerHTML = "";
-
-    if(!curso || !CONFIG.CURSOS[curso]){
-      select.disabled = true;
-      var op0 = document.createElement("option");
-      op0.value = "";
-      op0.textContent = "Selecione primeiro o curso…";
-      select.appendChild(op0);
-      return;
-    }
-
-    select.disabled = false;
-
-    var op = document.createElement("option");
-    op.value = "";
-    op.textContent = "Selecione…";
-    select.appendChild(op);
-
-    CONFIG.CURSOS[curso].turmas.forEach(function(turma){
-      var item = document.createElement("option");
-      item.value = turma;
-      item.textContent = turma;
-      select.appendChild(item);
-    });
-  }
-
   function destState(){
-    var out = {curso:false, ped:false, acess:false};
+    var out={curso:false,ped:false,acess:false};
     document.querySelectorAll("#dest .chip").forEach(function(c){
-      out[c.dataset.key] = c.classList.contains("on");
+      out[c.dataset.key]=c.classList.contains("on");
     });
     return out;
   }
 
   function dadosForm(){
     return {
-      estudante: $("estudante").value.trim(),
-      curso: $("curso").value,
-      turma: $("turma").value,
-      tipo: $("tipo").value,
-      urgencia: urgencia,
-      descricao: $("descricao").value.trim()
+      prof:$("professor").value.trim(),
+      estudante:$("estudante").value.trim(),
+      curso:$("curso").value,
+      turma:$("turma").value,
+      tipo:$("tipo").value,
+      urgencia:urgencia,
+      descricao:$("descricao").value.trim()
     };
   }
 
   function dataBR(){
-    var d = new Date();
-    var p = function(n){ return (n < 10 ? "0" : "") + n; };
-    return p(d.getDate()) + "/" + p(d.getMonth()+1) + "/" + d.getFullYear() + " às " + p(d.getHours()) + ":" + p(d.getMinutes());
+    var d=new Date(), p=function(n){return (n<10?"0":"")+n;};
+    return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" às "+p(d.getHours())+":"+p(d.getMinutes());
   }
 
   function assunto(d){
-    return "[Encaminhamento] " + (d.estudante || "Estudante") + " — " + (d.tipo || "sem tipo");
+    return "[Encaminhamento] "+(d.estudante||"Estudante")+" — "+(d.tipo||"sem tipo");
   }
 
   function corpo(d){
     return [
       "Encaminhamento de estudante",
       "",
-      "Estudante: " + (d.estudante || "—"),
-      "Curso: " + (d.curso || "—"),
-      "Turma: " + (d.turma || "—"),
-      "Tipo de ocorrência: " + (d.tipo || "—"),
-      "Nível de urgência: " + d.urgencia,
+      "Estudante: "+(d.estudante||"—"),
+      "Curso: "+(d.curso||"—"),
+      "Turma: "+(d.turma||"—"),
+      "Tipo de ocorrência: "+(d.tipo||"—"),
+      "Nível de urgência: "+d.urgencia,
       "",
       "Descrição:",
-      (d.descricao || "—"),
+      (d.descricao||"—"),
       "",
       "—",
-      "Data: " + dataBR()
-    ].join("
-");
+      "Enviado por: "+(d.prof||"—"),
+      "Data: "+dataBR()
+    ].join(NL);
+  }
+
+  function atualizarTurmas(){
+    var curso = $("curso").value;
+    var turma = $("turma");
+
+    turma.innerHTML = "";
+
+    if(!curso || !CURSOS[curso]){
+      turma.disabled = true;
+      turma.appendChild(new Option("Selecione primeiro o curso…", ""));
+      return;
+    }
+
+    turma.disabled = false;
+    turma.appendChild(new Option("Selecione…", ""));
+
+    CURSOS[curso].turmas.forEach(function(t){
+      turma.appendChild(new Option(t, t));
+    });
   }
 
   function renderPreview(){
-    var d = dadosForm();
-    var dest = destState();
-    var alvos = [];
+    var d=dadosForm(), dest=destState(), alvos=[];
+    if(dest.curso) alvos.push("Coord. de Curso"+(d.curso?" ("+d.curso+")":""));
+    if(dest.ped) alvos.push("Coord. Pedagógica");
+    if(dest.acess) alvos.push("CLAI");
 
-    if(dest.curso){
-      alvos.push("Coord. de Curso" + (d.curso ? " (" + d.curso + ")" : ""));
-    }
-    if(dest.ped){
-      alvos.push("Coord. Pedagógica");
-    }
-    if(dest.acess){
-      alvos.push("Coord. Acessibilidade e Inclusão");
-    }
+    var pv=$("preview");
+    pv.innerHTML="";
 
-    var pv = $("preview");
-    pv.innerHTML = "";
-
-    var s = document.createElement("span");
-    s.className = "subj";
-    s.textContent = "Para: " + (alvos.length ? alvos.join(" + ") : "(nenhum selecionado)") + "
-Assunto: " + assunto(d);
+    var s=document.createElement("span");
+    s.className="subj";
+    s.textContent="Para: "+(alvos.length?alvos.join(" + "):"(nenhum selecionado)")+NL+"Assunto: "+assunto(d);
 
     pv.appendChild(s);
     pv.appendChild(document.createTextNode(corpo(d)));
   }
 
   function faltando(){
-    var d = dadosForm();
-    var dest = destState();
-    var f = [];
-
+    var d=dadosForm(), dest=destState(), f=[];
+    if(!d.prof) f.push("responsável pelo encaminhamento");
     if(!d.estudante) f.push("nome do estudante");
     if(!d.curso) f.push("curso");
     if(!d.turma) f.push("turma");
     if(!d.tipo) f.push("tipo de ocorrência");
     if(!d.descricao) f.push("descrição");
     if(!dest.curso && !dest.ped && !dest.acess) f.push("ao menos um destinatário");
-
     return f;
   }
 
   function mostrarWarn(msg){
-    var w = $("warn");
+    var w=$("warn");
     if(!msg){
       w.classList.remove("show");
-      w.textContent = "";
+      w.textContent="";
       return;
     }
-    w.textContent = msg;
+    w.textContent=msg;
     w.classList.add("show");
-    w.scrollIntoView({behavior:"smooth", block:"center"});
+    w.scrollIntoView({behavior:"smooth",block:"center"});
   }
 
   var toastT;
   function toast(msg){
-    var t = $("toast");
-    t.textContent = msg;
+    var t=$("toast");
+    t.textContent=msg;
     t.classList.add("show");
     clearTimeout(toastT);
-    toastT = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+    toastT=setTimeout(function(){t.classList.remove("show");},2600);
   }
 
   function emailDoCurso(curso){
-    return CONFIG.CURSOS[curso] ? CONFIG.CURSOS[curso].email : "";
+    return CURSOS[curso] ? CURSOS[curso].email : "";
   }
 
   function emailsFallback(d,dest){
-    var t = [];
-
+    var t=[];
     if(dest.curso){
-      var e = emailDoCurso(d.curso);
+      var e=emailDoCurso(d.curso);
       if(e) t.push(e);
     }
+    if(dest.ped && CONFIG.EMAILS.ped) t.push(CONFIG.EMAILS.ped);
+    if(dest.acess && CONFIG.EMAILS.acess) t.push(CONFIG.EMAILS.acess);
 
-    if(dest.ped && CONFIG.EMAILS.pedagogica){
-      t.push(CONFIG.EMAILS.pedagogica);
-    }
-
-    if(dest.acess && CONFIG.EMAILS.acessibilidade){
-      t.push(CONFIG.EMAILS.acessibilidade);
-    }
-
-    return t;
+    // Remove duplicidades, caso algum e-mail se repita.
+    return t.filter(function(email, idx, arr){
+      return email && arr.indexOf(email) === idx;
+    });
   }
 
   function salvarHist(d,alvos,modo){
     hist.unshift({
-      nome: d.estudante,
-      tipo: d.tipo,
-      curso: d.curso,
-      turma: d.turma,
-      urg: d.urgencia,
-      alvos: alvos,
-      modo: modo || "",
-      quando: dataBR()
+      nome:d.estudante,
+      tipo:d.tipo,
+      curso:d.curso,
+      turma:d.turma,
+      urg:d.urgencia,
+      alvos:alvos,
+      modo:modo||"",
+      quando:dataBR()
     });
-    hist = hist.slice(0,20);
-    store.set("notifica.hist", hist);
-  }
-
-  function setEnviando(v){
-    enviando = v;
-    var b = $("send");
-    b.disabled = v;
-    $("sendLabel").textContent = v ? "Enviando…" : "Enviar notificação";
-  }
-
-  function limparAposEnvio(){
-    $("estudante").value = "";
-    $("tipo").value = "";
-    $("descricao").value = "";
-
-    document.querySelectorAll("#urg button").forEach(function(x){
-      x.dataset.on = "false";
-    });
-
-    document.querySelector("#urg button.b").dataset.on = "true";
-    urgencia = "Baixa";
-    renderPreview();
+    hist=hist.slice(0,20);
+    store.set("notifica.hist",hist);
   }
 
   function alvosCurtos(dest){
-    var a = [];
-    if(dest.curso) a.push("Curso");
-    if(dest.ped) a.push("Pedagógica");
-    if(dest.acess) a.push("Acessibilidade");
+    var a=[];
+    if(dest.curso)a.push("Curso");
+    if(dest.ped)a.push("Pedagógica");
+    if(dest.acess)a.push("CLAI");
     return a.join("+");
   }
 
   function mailtoFallback(d,dest){
-    var tos = emailsFallback(d,dest);
+    var tos=emailsFallback(d,dest);
     if(!tos.length) return false;
 
-    window.location.href = "mailto:" + encodeURIComponent(tos.join(",")) +
+    window.location.href =
+      "mailto:" + tos.join(",") +
       "?subject=" + encodeURIComponent(assunto(d)) +
       "&body=" + encodeURIComponent(corpo(d));
 
@@ -502,110 +452,98 @@ Assunto: " + assunto(d);
   function enviar(){
     if(enviando) return;
 
-    var f = faltando();
+    var f=faltando();
     if(f.length){
-      mostrarWarn("Falta preencher: " + f.join(", ") + ".");
+      mostrarWarn("Falta preencher: "+f.join(", ")+".");
       return;
     }
 
     mostrarWarn("");
 
-    var d = dadosForm();
-    var dest = destState();
-
+    var d=dadosForm(), dest=destState();
     if(mailtoFallback(d,dest)){
-      salvarHist(d, alvosCurtos(dest), "e-mail");
+      salvarHist(d,alvosCurtos(dest),"e-mail");
       toast("E-mail aberto — é só confirmar o envio ✓");
-    }else{
+    } else {
       toast("Não consegui montar o e-mail. Tente de novo.");
     }
   }
 
   function copiar(){
-    var d = dadosForm();
-    var txt = assunto(d) + "
-
-" + corpo(d);
-    var done = function(){ toast("Texto copiado ✓"); };
+    var d=dadosForm();
+    var txt=assunto(d)+NL+NL+corpo(d);
+    var done=function(){ toast("Texto copiado ✓"); };
 
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(done, function(){
+      navigator.clipboard.writeText(txt).then(done,function(){
         fallbackCopy(txt);
         done();
       });
-    }else{
+    } else {
       fallbackCopy(txt);
       done();
     }
   }
 
   function fallbackCopy(t){
-    var ta = document.createElement("textarea");
-    ta.value = t;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
+    var ta=document.createElement("textarea");
+    ta.value=t;
+    ta.style.position="fixed";
+    ta.style.opacity="0";
     document.body.appendChild(ta);
     ta.focus();
     ta.select();
-
-    try{
-      document.execCommand("copy");
-    }catch(e){}
-
+    try{document.execCommand("copy");}catch(e){}
     document.body.removeChild(ta);
   }
 
   function enviarWpp(){
-    var f = faltando();
+    var f=faltando();
     if(f.length){
-      mostrarWarn("Falta preencher: " + f.join(", ") + ".");
+      mostrarWarn("Falta preencher: "+f.join(", ")+".");
       return;
     }
 
     mostrarWarn("");
 
-    var d = dadosForm();
-    var txt = assunto(d) + "
+    var d=dadosForm();
+    var txt=assunto(d)+NL+NL+corpo(d);
 
-" + corpo(d);
-
-    salvarHist(d, alvosCurtos(destState()), "WhatsApp");
-    window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
+    salvarHist(d,alvosCurtos(destState()),"WhatsApp");
+    window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");
   }
 
-  ["estudante","turma","tipo","descricao"].forEach(function(id){
-    $(id).addEventListener("input", renderPreview);
-    $(id).addEventListener("change", renderPreview);
+  ["professor","estudante","turma","tipo","descricao"].forEach(function(id){
+    $(id).addEventListener("input",renderPreview);
+    $(id).addEventListener("change",renderPreview);
   });
 
-  $("curso").addEventListener("change", function(){
+  $("curso").addEventListener("change",function(){
     atualizarTurmas();
     renderPreview();
   });
 
   document.querySelectorAll("#dest .chip").forEach(function(c){
-    c.addEventListener("click", function(e){
+    c.addEventListener("click",function(e){
       e.preventDefault();
       c.classList.toggle("on");
-      c.querySelector("input").checked = c.classList.contains("on");
+      c.querySelector("input").checked=c.classList.contains("on");
       renderPreview();
     });
   });
 
   document.querySelectorAll("#urg button").forEach(function(b){
-    b.addEventListener("click", function(){
-      document.querySelectorAll("#urg button").forEach(function(x){
-        x.dataset.on = "false";
-      });
-      b.dataset.on = "true";
-      urgencia = b.dataset.val;
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#urg button").forEach(function(x){x.dataset.on="false";});
+      b.dataset.on="true";
+      urgencia=b.dataset.val;
       renderPreview();
     });
   });
 
-  $("send").addEventListener("click", enviar);
-  $("copy").addEventListener("click", copiar);
-  $("wpp").addEventListener("click", enviarWpp);
+  $("send").addEventListener("click",enviar);
+  $("copy").addEventListener("click",copiar);
+  $("wpp").addEventListener("click",enviarWpp);
 
   atualizarTurmas();
   renderPreview();
