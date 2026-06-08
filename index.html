@@ -564,11 +564,13 @@
     var tos=emailsFallback(d,dest);
     if(!tos.length) return false;
 
-    window.location.href =
-      "mailto:" + tos.join(",") +
-      "?subject=" + encodeURIComponent(assunto(d)) +
+    var url =
+      "https://mail.google.com/mail/?view=cm&fs=1" +
+      "&to="   + encodeURIComponent(tos.join(",")) +
+      "&su="   + encodeURIComponent(assunto(d)) +
       "&body=" + encodeURIComponent(corpo(d));
 
+    window.open(url, "_blank");
     return true;
   }
 
