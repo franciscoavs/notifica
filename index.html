@@ -560,17 +560,34 @@
     renderPreview();
   }
 
+  // Detecta celular/tablet para escolher como abrir o e-mail.
+  function ehMobile(){
+    if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
+      return navigator.userAgentData.mobile;
+    }
+    return /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(navigator.userAgent || "");
+  }
+
   function mailtoFallback(d,dest){
     var tos=emailsFallback(d,dest);
     if(!tos.length) return false;
 
-    var url =
-      "https://mail.google.com/mail/?view=cm&fs=1" +
-      "&to="   + encodeURIComponent(tos.join(",")) +
-      "&su="   + encodeURIComponent(assunto(d)) +
-      "&body=" + encodeURIComponent(corpo(d));
+    if (ehMobile()) {
+      // No celular, o mailto: entrega direto para o app de e-mail padrão (Gmail, Mail, etc.).
+      window.location.href =
+        "mailto:" + tos.join(",") +
+        "?subject=" + encodeURIComponent(assunto(d)) +
+        "&body=" + encodeURIComponent(corpo(d));
+    } else {
+      // No computador, abre a composição do Gmail na web (evita o seletor de programa do Windows).
+      var url =
+        "https://mail.google.com/mail/?view=cm&fs=1" +
+        "&to="   + encodeURIComponent(tos.join(",")) +
+        "&su="   + encodeURIComponent(assunto(d)) +
+        "&body=" + encodeURIComponent(corpo(d));
+      window.open(url, "_blank");
+    }
 
-    window.open(url, "_blank");
     return true;
   }
 
